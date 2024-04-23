@@ -6,7 +6,7 @@ function ZS_help(doc)
 %-------------------------------------------------------------------------------
 ZS_ROOT = ZS_R_rootPath;
 UQ_ROOT = uq_rootPath;
-ZS_manual_path = [ZS_ROOT,'\Documentation\Rep-ZS+R.pdf'];
+ZS_manual_path = [ZS_ROOT,'\Rep-ZS+R.pdf'];
 UQ_manual_path = [UQ_ROOT,'\Doc\Manuals'];
 
 

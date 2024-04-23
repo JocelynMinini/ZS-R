@@ -32,9 +32,15 @@ classdef ZS_Beam_s04 < dynamicprops
     % If the length of the .his is bigger than the size of the matrix
     % return a global error
     N_Time_Res = size(beam_res);
-    if N_HIS ~= N_Time_Res(3)
-        error('Array dimensions between the results and the time steps are inconsistent. Please try to run the ZSoil calculation again.')
+
+    if length(N_Time_Res) == 3
+
+        if N_HIS ~= N_Time_Res(3) & length(N_Time_Res) ~= 3
+            error('Array dimensions between the results and the time steps are inconsistent. Please try to run the ZSoil calculation again.')
+        end
+
     end
+
 
     % Get the logical array for the user requested elements
     BOOLE_EL = LINK_OBJ.MODEL_dat.ELEMENTS.get_element_ID_selection('Beam',OPTS);
@@ -91,25 +97,27 @@ classdef ZS_Beam_s04 < dynamicprops
 
                 else
 
-                    % Extract beam length
-                    BEL2 = LINK_OBJ.MODEL_dat.ELEMENTS.BEAMS.BEL2;
-                    beam_length = zeros(length(BEL2),length(BOOLE_HIS));
-                    for k = 1:length(BEL2)
-                        beam_length(k,:) = LINK_OBJ.MODEL_dat.ELEMENTS.BEAMS.BEL2.get_beam_length(BEL2(k,:),LINK_OBJ.MODEL_dat.NODES);
-                    end
-
-                    % Select the corresponding shear force
-                    if current_axe == "Y"
-                        shear = FORCES.Z(BOOLE_BEL2,:);
-                    elseif current_axe == "Z"
-                        shear = FORCES.Y(BOOLE_BEL2,:);
-                    end
-
-                    % Adjust the moment value by M = M0 + Q*L/2
-                    try 
-                        moments_adjusted = temp(BOOLE_BEL2,:);
-                        moments_adjusted = moments_adjusted + (shear.*beam_length)/2;
-                        temp(BOOLE_BEL2,:) = moments_adjusted;
+                    try
+                        % Extract beam length
+                        BEL2 = LINK_OBJ.MODEL_dat.ELEMENTS.BEAMS.BEL2;
+                        beam_length = zeros(length(BEL2),length(BOOLE_HIS));
+                        for k = 1:length(BEL2)
+                            beam_length(k,:) = LINK_OBJ.MODEL_dat.ELEMENTS.BEAMS.BEL2.get_beam_length(BEL2(k,:),LINK_OBJ.MODEL_dat.NODES);
+                        end
+    
+                        % Select the corresponding shear force
+                        if current_axe == "Y"
+                            shear = FORCES.Z(BOOLE_BEL2,:);
+                        elseif current_axe == "Z"
+                            shear = FORCES.Y(BOOLE_BEL2,:);
+                        end
+    
+                        % Adjust the moment value by M = M0 + Q*L/2
+                        try 
+                            moments_adjusted = temp(BOOLE_BEL2,:);
+                            moments_adjusted = moments_adjusted + (shear.*beam_length)/2;
+                            temp(BOOLE_BEL2,:) = moments_adjusted;
+                        end
                     end
 
                     temp = mat2cell(temp,GP_LST,ones(1,N_HIS));

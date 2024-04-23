@@ -23,8 +23,10 @@ for i = 1:length(PCE_model_names)
     Sobol = uq_createAnalysis(OPTS);
     All_Sensitivity.(PCE_model_names(i)) = Sobol;
     Total_indices = [Total_indices,Sobol.Results.Total];
+    uq_display(Sobol)
 end
 
+figure
 var = categorical({All_Inputs.ZSoil.Initial.Marginals.Name});
 var = reordercats(var,{All_Inputs.ZSoil.Initial.Marginals.Name});
 bar(var,Total_indices)
