@@ -265,7 +265,7 @@ classdef ZS_Results < dynamicprops
     %-------------------------------------------------------------------------------
     TYPE_UPPER = upper(TYPE);
     TYPE_UPPER_S = strcat(TYPE_UPPER,"S");
-    self.addprop(TYPE_UPPER);
+    self.addprop(TYPE_UPPER_S);
 
 
     Name = LINK_OBJ.JOB.NAME;

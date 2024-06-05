@@ -88,6 +88,21 @@ else
 end
 zsoil_path = Softwares.get_path("ZSOIL",user_version);
 
+% Run prepro ?
+if isfield(OPTIONS,'Command')
+    if ~isfield(OPTIONS.Command,'RunPrepro')
+        run_prepro = false;
+    else
+        run_prepro = OPTIONS.Command.RunPrepro;
+    end
+else
+    run_prepro = false;
+end
+
+if ~islogical(run_prepro)
+    error("'Command.RunPrepro' must be a logical.")
+end
+
 
 % Extract execution path
 if isfield(OPTIONS,'ExecutionPath')
@@ -123,8 +138,14 @@ end
 
 % Make the command line
 if strcmp(extansion,'inp')
-    zsoil_path_with_exe = [char(zsoil_path),'\Z_Soil.exe'];
-    command = strcat('"',zsoil_path_with_exe,'" "',execution_path,'\',output_file_name,'"',silent_mode);
+    zsoil_path_with_exe  = [char(zsoil_path),'\Z_Soil.exe'];
+    prepro_path_with_exe = [char(zsoil_path),'\Z_Prep3D.exe'];
+    if run_prepro
+        command = strcat('"',prepro_path_with_exe,'" "',execution_path,'\',output_file_name,'" /T',...
+                         ' && "',zsoil_path_with_exe,'" "',execution_path,'\',output_file_name,'"',silent_mode);
+    else
+        command = strcat('"',zsoil_path_with_exe,'" "',execution_path,'\',output_file_name,'"',silent_mode);
+    end
 elseif strcmp(extansion,'dat')
     zsoil_path_with_exe = [char(zsoil_path),'\Z_Calc.exe'];
     version_year = char(user_version);

@@ -86,26 +86,20 @@ InputDirPath = [ExePath,'\temp_Execution'];
 NFiles = size(dir(fullfile(InputDirPath, ['*.',Extension])),1); % count the number of .inp files
 FileName = regexprep(modelToEvaluate.Internal.Output.FileName{1},'\.[^.]*$',''); 
 
-add_folder = 'temp_Execution\';
-if strcmp(Extension,'inp')
-    second_gap = 8;
-elseif strcmp(Extension,'dat')
-    if contains(modelToEvaluate.Internal.Command,'[#@QUIET_MODE@#]')
-        second_gap = 19;
-    else
-        second_gap = 3;
-    end
-else
-    error('Unknown file extansion.')
-end
-first_gap = second_gap + length(FileName);
-
+add_folder = 'temp_Execution\\';
 exeCmd_with_cd = cell(NFiles,1);
 for i = 1:NFiles % generate a list with the string to be evaluate in windows command
+    
     ExeCmd = modelToEvaluate.Internal.Command;
-    ExeCmd = insertAfter(ExeCmd,length(ExeCmd)-first_gap,add_folder);
-    ExeCmd = insertAfter(ExeCmd,length(ExeCmd)-second_gap,num2str(i));
+    pattern = [FileName,'.',Extension];
+    replacement = sprintf('Pile%d.inp', i);
+    replacement = [add_folder,replacement];
+    
+    parts = split(ExeCmd, pattern);
+    ExeCmd = strjoin(parts, replacement);
+    
     exeCmd_with_cd{i,1} = ['cd /d "', InputDirPath, '" && ', ExeCmd];
+    clear replacement
 end
 
 Blocks = fix(NFiles/NThread); % Number of blacks
