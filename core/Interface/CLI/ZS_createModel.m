@@ -142,7 +142,8 @@ if strcmp(extansion,'inp')
     prepro_path_with_exe = [char(zsoil_path),'\Z_Prep3D.exe'];
     if run_prepro
         command = strcat('"',prepro_path_with_exe,'" "',execution_path,'\',output_file_name,'" /T',...
-                         ' && "',zsoil_path_with_exe,'" "',execution_path,'\',output_file_name,'"',silent_mode);
+                         ' && ping 127.0.0.1 -n 6 > nul && "',... 
+                         zsoil_path_with_exe,'" "',execution_path,'\',output_file_name,'"',silent_mode);
     else
         command = strcat('"',zsoil_path_with_exe,'" "',execution_path,'\',output_file_name,'"',silent_mode);
     end
