@@ -73,7 +73,8 @@
         %                 with the pile
         % Last Update:    16.10.2023
         %-------------------------------------------------------------------------------
-        is_all = ~isfield(OPTS,"ID");
+        is_all = ~isfield(OPTS,"ID") || strcmp(OPTS.ID,'All');
+
 
         if is_all
             IDs = [self.ID];

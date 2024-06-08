@@ -326,9 +326,9 @@ classdef ZS_Results < dynamicprops
         BEAM_CLASS = ZS_Beam_s04;
         CONTACT_CLASS = ZS_Contact_s07;
         % Beam elements
-        self.(TYPE_UPPER).(TEMP_LABEL).BEAMS = BEAM_CLASS.get_s04(DATA.s04,LINK_OBJ,TEMP_BEAM_OPTS);
+        self.(TYPE_UPPER_S).(TEMP_LABEL).BEAMS = BEAM_CLASS.get_s04(DATA.s04,LINK_OBJ,TEMP_BEAM_OPTS);
         % Contact elements
-        self.(TYPE_UPPER).(TEMP_LABEL).CONTACTS = CONTACT_CLASS.get_s07(DATA.s07,LINK_OBJ,TEMP_CONTACT_OPTS);
+        self.(TYPE_UPPER_S).(TEMP_LABEL).CONTACTS = CONTACT_CLASS.get_s07(DATA.s07,LINK_OBJ,TEMP_CONTACT_OPTS);
     end
     end
 

@@ -51,7 +51,7 @@ for i = 1:NFiles % generate a list with the string to be evaluate in windows com
     
     ExeCmd = modelToEvaluate.Internal.Command;
     pattern = [FileName,'.',Extension];
-    replacement = sprintf('Pile%d.inp', i);
+    replacement = sprintf([FileName,'%d.inp'], i);
     replacement = [add_folder,replacement];
     
     parts = split(ExeCmd, pattern);
