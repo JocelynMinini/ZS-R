@@ -15,39 +15,29 @@ function [Y,ExeSucess] = ZS_parallel_evalModel(modelToEvaluate,Input,ZSoilThread
 
 tic % start a timer
 
-% Kill the existing parallel pool
-%-------------------------------------------------------------------------------
-temp_p = gcp('nocreate');
-if ~isempty(temp_p)
-    delete(temp_p);
-end
-%-------------------------------------------------------------------------------
-
 % According to the number of available cores on the actual machine,
 % the parallel pool is configured
 %-------------------------------------------------------------------------------
 availableCores = maxNumCompThreads;
-max_calculation_per_node = 2;
 
 if ~exist('ZSoilThread','var') % if third argument was not given, default threads = 10
-    ZSoilThread = 4;
-    disp('### Default Nthread = 4 will be used ###')
+    ZSoilThread = maxNumCompThreads/2;
+    disp(['### Default Nthread = ',char(string(availableCores)),' will be used ###'])
     fprintf('\n');
     NThread = ZSoilThread;
-elseif ZSoilThread>max_calculation_per_node*availableCores %  threads are limited to 3 per core
-    NThread = max_calculation_per_node*availableCores;
-    warning(['For performance reasons, the number of jobs per core is limited to ',num2str(max_calculation_per_node),'.',num2str(availableCores,'%d'),' workers are available on the current machine -> Total number of thread is limited to NThread = ',num2str(NThread,'%d')])
+elseif ZSoilThread > availableCores %  threads are limited to 3 per core
+    NThread = availableCores;
+    warning(['For performance reasons, the number of jobs per core is limited to ',num2str(availableCores,'%d'),' workers are available on the current machine -> Total number of thread is limited to NThread = ',num2str(NThread,'%d')])
 else
     NThread = ZSoilThread;
 end
 clear ZSoilThread
 
-if NThread<availableCores %  start the parallel pool in MATLAB
-    p = parpool;
-else
-    myCluster = parcluster('local');
-    myCluster.NumWorkers = NThread;
-    p = parpool(myCluster);
+try
+    myCluster             = parcluster('local');
+    myCluster.NumWorkers  = NThread;
+    myCluster.IdleTimeout = 120;
+    p                     = parpool(myCluster);
 end
 %-------------------------------------------------------------------------------
 
@@ -167,7 +157,6 @@ end
 %-------------------------------------------------------------------------------
 
 
-delete(p);  % Shut down the parallel pool
 save(fullfile(ExePath,[modelToEvaluate.Name,'.mat']),'X','Y'); % Save the files
 disp('Done - File saved !')
 Time = toc;
