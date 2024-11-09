@@ -1,4 +1,4 @@
-function [Y,ExeSucess] = ZS_parallel_evalModel(modelToEvaluate,Input,ZSoilThread)
+function [Y,ExeSucess] = ZS_parallel_evalModel(modelToEvaluate,Input,NThread,dispOpts)
 %-------------------------------------------------------------------------------
 % Name:           uq_parallel_evalModel
 % Purpose:        This function allows to evaluate in parallel a third-party 
@@ -18,26 +18,21 @@ tic % start a timer
 % According to the number of available cores on the actual machine,
 % the parallel pool is configured
 %-------------------------------------------------------------------------------
-availableCores = maxNumCompThreads;
 
-if ~exist('ZSoilThread','var') % if third argument was not given, default threads = 10
-    ZSoilThread = maxNumCompThreads/2;
-    disp(['### Default Nthread = ',char(string(availableCores)),' will be used ###'])
-    fprintf('\n');
-    NThread = ZSoilThread;
-elseif ZSoilThread > availableCores %  threads are limited to 3 per core
-    NThread = availableCores;
-    warning(['For performance reasons, the number of jobs per core is limited to ',num2str(availableCores,'%d'),' workers are available on the current machine -> Total number of thread is limited to NThread = ',num2str(NThread,'%d')])
-else
-    NThread = ZSoilThread;
+if ~exist('NThread','var') % if third argument was not given, default threads = 10
+    NThread = maxNumCompThreads;
 end
-clear ZSoilThread
+
+if ~exist('dispOpts','var') % if third argument was not given, default threads = 10
+    dispOpts = true;
+end
 
 try
     myCluster             = parcluster('local');
     myCluster.NumWorkers  = NThread;
-    myCluster.IdleTimeout = 120;
     p                     = parpool(myCluster);
+catch me
+    %
 end
 %-------------------------------------------------------------------------------
 
@@ -117,14 +112,22 @@ X = Input;
 %-------------------------------------------------------------------------------
 ExeSucess = zeros(NFiles,1);
 Y = cell(NFiles,1);
-fprintf('\n');
+
+if dispOpts
+    fprintf('\n');
+end
+
 for j = 1:length(Pool)
 parIndex = Pool{j};
-disp(['Starting block n° : ',num2str(j,'%d'),'...'])
+if dispOpts
+    disp(['Starting block n° : ',num2str(j,'%d'),'...'])
+end
     parfor i = parIndex
         
         pause(randi([1,10]))
-        disp(['Evaluation n° : ',num2str(i,'%d')])
+        if dispOpts
+            disp(['Evaluation n° : ',num2str(i,'%d')])
+        end
         status_run = system(exeCmd_with_cd{i}); % Run command
 
         if status_run ~= 0 %Check success
@@ -142,8 +145,12 @@ disp(['Starting block n° : ',num2str(j,'%d'),'...'])
         end
     end
 save(fullfile(ExePath,['temp_',modelToEvaluate.Name,'.mat']),'X','Y');     % Save the current block iteration
-disp(['Block n° : ',num2str(j,'%d'),' - Saved !'])
-fprintf('\n');
+
+if dispOpts
+    disp(['Block n° : ',num2str(j,'%d'),' - Saved !'])
+    fprintf('\n');
+end
+
 end
 
 
@@ -158,18 +165,20 @@ end
 
 
 save(fullfile(ExePath,[modelToEvaluate.Name,'.mat']),'X','Y'); % Save the files
-disp('Done - File saved !')
-Time = toc;
-[h,m,s] = hms(seconds(Time));
-disp(['Total execution time : ',num2str(h,'%d'),'h ',num2str(m,'%d'),'m ',num2str(round(s),'%d'),'s'])
+if dispOpts
+    disp('Done - File saved !')
+    Time = toc;
+    [h,m,s] = hms(seconds(Time));
+    disp(['Total execution time : ',num2str(h,'%d'),'h ',num2str(m,'%d'),'m ',num2str(round(s),'%d'),'s'])
+end
 
 if isfile(fullfile(ExePath,['temp_',modelToEvaluate.Name,'.mat']))
     delete(fullfile(ExePath,['temp_',modelToEvaluate.Name,'.mat']))
 end
 
 catch ER
-delete(p);
 try 
+    delete(p);
     rmdir(InputDirPath,'s')
 end
 error(['Error in execution - Error message : ',ER.message])

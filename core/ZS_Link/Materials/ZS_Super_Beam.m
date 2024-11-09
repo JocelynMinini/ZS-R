@@ -1,6 +1,6 @@
 classdef ZS_Super_Beam < dynamicprops
 
-    properties(SetAccess = ?ZS_Model ,Hidden = true)
+    properties(SetAccess = ?ZS_Model)
     MODEL
     MAT_ID
     end
