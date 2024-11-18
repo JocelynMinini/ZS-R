@@ -1,4 +1,4 @@
-function [Y,ExeSucess] = ZS_parallel_evalModel(modelToEvaluate,Input,NThread,dispOpts)
+function [Y,ExeSucess] = ZS_parallel_evalModel(modelToEvaluate,Input,NThread,dispOpts,saveQ)
 %-------------------------------------------------------------------------------
 % Name:           uq_parallel_evalModel
 % Purpose:        This function allows to evaluate in parallel a third-party 
@@ -23,8 +23,12 @@ if ~exist('NThread','var') % if third argument was not given, default threads = 
     NThread = maxNumCompThreads;
 end
 
-if ~exist('dispOpts','var') % if third argument was not given, default threads = 10
+if ~exist('dispOpts','var')
     dispOpts = true;
+end
+
+if ~exist('saveQ','var')
+    saveQ = true;
 end
 
 try
@@ -144,7 +148,10 @@ end
             delete([InputDirPath,'\',upper(FileName),num2str(i),'.*'])         % Delete the files in temp folder (for uppercase)
         end
     end
-save(fullfile(ExePath,['temp_',modelToEvaluate.Name,'.mat']),'X','Y');     % Save the current block iteration
+
+    if saveQ
+        save(fullfile(ExePath,['temp_',modelToEvaluate.Name,'.mat']),'X','Y');     % Save the current block iteration
+    end
 
 if dispOpts
     disp(['Block n° : ',num2str(j,'%d'),' - Saved !'])
@@ -163,8 +170,12 @@ end
 end
 %-------------------------------------------------------------------------------
 
+if saveQ
+    save(fullfile(ExePath,[modelToEvaluate.Name,'.mat']),'X','Y'); % Save the files
+end
 
-save(fullfile(ExePath,[modelToEvaluate.Name,'.mat']),'X','Y'); % Save the files
+
+
 if dispOpts
     disp('Done - File saved !')
     Time = toc;
