@@ -81,7 +81,7 @@ for i = 1:NFiles % generate a list with the string to be evaluate in windows com
     
     ExeCmd = modelToEvaluate.Internal.Command;
     pattern = [FileName,'.',Extension];
-    replacement = sprintf([FileName,'%d.inp'], i);
+    replacement = sprintf([FileName,['%d.',Extension]], i);
     replacement = [add_folder,replacement];
     
     parts = split(ExeCmd, pattern);
@@ -141,7 +141,7 @@ end
             ExeSucess(i) = true ;
         end    
         
-        Y{i} = temp_parser([InputDirPath,'\',FileName,num2str(i),'.inp']); % read the output files with user parser and store the result in a cell
+        Y{i} = temp_parser([InputDirPath,'\',FileName,num2str(i),['.',Extension]]); % read the output files with user parser and store the result in a cell
        
         if strcmp(modelToEvaluate.Internal.Archiving.Action,'delete')
             delete([InputDirPath,'\',FileName,num2str(i),'.*'])                % Delete the files in temp folder

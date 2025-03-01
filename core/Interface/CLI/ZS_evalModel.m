@@ -1,4 +1,4 @@
-function [Y,ExeSucess] = ZS_evalModel(modelToEvaluate,Input)
+function [Y,ExeSucess] = ZS_evalModel(modelToEvaluate,Input,dispOpts)
 %-------------------------------------------------------------------------------
 % Name:           ZS_evalModel
 % Purpose:        This function allows to evaluate in sequential a third-party 
@@ -21,6 +21,9 @@ Extension = Extension{end};
 
 status = ZS_generateINP(modelToEvaluate,Input); % generate the inp files
 
+if ~exist("dispOpts","var")
+    dispOpts = false;
+end
 
 if status == 0
     disp('### Calculation aborted by the user ###')
@@ -51,7 +54,7 @@ for i = 1:NFiles % generate a list with the string to be evaluate in windows com
     
     ExeCmd = modelToEvaluate.Internal.Command;
     pattern = [FileName,'.',Extension];
-    replacement = sprintf([FileName,'%d.inp'], i);
+    replacement = sprintf([FileName,['%d.',Extension]], i);
     replacement = [add_folder,replacement];
     
     parts = split(ExeCmd, pattern);
@@ -69,7 +72,9 @@ fprintf('\n');
 
 for i = 1:NFiles
     
-    disp(['Evaluation n° : ',num2str(i,'%d')])
+    if dispOpts
+        disp(['Evaluation n° : ',num2str(i,'%d')])
+    end
     status_run = system(exeCmd_with_cd{i}); % Run command
 
     if status_run ~= 0 %Check success
@@ -98,10 +103,12 @@ end
 %-------------------------------------------------------------------------------
 
 %save(fullfile(ExePath,[modelToEvaluate.Name,'.mat']),'X','Y'); % Save the files
-disp('Done !')
-Time = toc(t_Start);
-[h,m,s] = hms(seconds(Time));
-disp(['Total execution time : ',num2str(h,'%d'),'h ',num2str(m,'%d'),'m ',num2str(round(s),'%d'),'s'])
+if dispOpts
+    disp('Done !')
+    Time = toc(t_Start);
+    [h,m,s] = hms(seconds(Time));
+    disp(['Total execution time : ',num2str(h,'%d'),'h ',num2str(m,'%d'),'m ',num2str(round(s),'%d'),'s'])
+end
 
 catch ER
 try 

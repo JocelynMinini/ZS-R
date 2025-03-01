@@ -22,7 +22,7 @@ Softwares = Softwares.read_software_file("ZSOIL");
 
 %% Template options
 
-possible_extansions = [".inp.tpl.inp",".dat.tpl.dat","_.inp.tpl.inp","_.dat.tpl.dat"];
+possible_extansions = [".inp.tpl.inp",".dat.tpl.dat","_.inp.tpl.inp","_.dat.tpl.dat",".inpw.tpl.inpw","_inpw.tpl.inpw"];
 
 % Template Path
 if isfield(OPTIONS,'Template') & isfield(OPTIONS.Template,'Path')
@@ -113,18 +113,22 @@ end
 UQ_OPTS.ExecutionPath = execution_path;
 
 % Extract name of the output file (same as template)
-extansion = template_name(end-2:end);
+extansion = split(template_name,'.');
+extansion = extansion{end};
 output_file_name = erase(template_name,['.tpl.',extansion]);
 
 % Silent mode
-if strcmp(extansion,'inp')
+if strcmp(extansion,'inp') | strcmp(extansion,'inpw')
     silent_mode = ' /E';
 elseif strcmp(extansion,'dat')
     silent_mode = '';
 end
+
+
+
 if isfield(OPTIONS,"ZSoil") & isfield(OPTIONS.ZSoil,"SilentMode")
     if strcmp(OPTIONS.ZSoil.SilentMode,'on')
-        if strcmp(extansion,'inp')
+        if strcmp(extansion,'inp') | strcmp(extansion,'inpw')
             silent_mode = ' /S';
         elseif strcmp(extansion,'dat')
             silent_mode = '[#@QUIET_MODE@#]';
@@ -137,7 +141,7 @@ if isfield(OPTIONS,"ZSoil") & isfield(OPTIONS.ZSoil,"SilentMode")
 end
 
 % Make the command line
-if strcmp(extansion,'inp')
+if strcmp(extansion,'inp') | strcmp(extansion,'inpw')
     zsoil_path_with_exe  = [char(zsoil_path),'\Z_Soil.exe'];
     prepro_path_with_exe = [char(zsoil_path),'\Z_Prep3D.exe'];
     if run_prepro
