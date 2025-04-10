@@ -4,6 +4,7 @@ classdef ZS_Elements
     BEAMS 
     CONTACTS
     HINGES
+    INFINITE_EL
     MEMBRANES
     SHELLS
     SEEPAGES
@@ -313,7 +314,7 @@ classdef ZS_Elements
             try
                 el_class_lst = fieldnames(self.(field_names{i}));
                 el_class_lst = string(el_class_lst);
-                test = any(contains(el_class_lst,EL_class));
+                test = any(ismember(el_class_lst,EL_class));
                 if test
                     group = field_names{i};
                     break

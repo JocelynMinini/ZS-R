@@ -104,17 +104,22 @@ end
         X_Str_Mat = extractBetween(S,'<','>'); 
 
         for i = 1:LX_ED(2)
-            eval(strcat(Names{i},'=',num2str(X_ED(j,i)),';'));
+            data = X_ED(j,i);
+            if ~isstring(data)
+                eval(strcat(Names{i},'=',num2str(data),';'));
+            else
+                eval(strcat(Names{i},'=','data',';'));
+            end
         end
   
-            for i = 1:size(X_Str_Mat,1)
-                try
-                    X_Str_Mat{i,2} = eval(X_Str_Mat{i,1});
-                catch ME
-                    error(strcat("Error while evaluating the expression : '",X_Str_Mat{i,1},"'. Please check your syntax in the template file. ", "Returned message : ",ME.message))
-                end
-                X_Str_Mat{i,1} = append('<',X_Str_Mat{i,1},'>');
+        for i = 1:size(X_Str_Mat,1)
+            try
+                X_Str_Mat{i,2} = eval(X_Str_Mat{i,1});
+            catch ME
+                error(strcat("Error while evaluating the expression : '",X_Str_Mat{i,1},"'. Please check your syntax in the template file. ", "Returned message : ",ME.message))
             end
+            X_Str_Mat{i,1} = append('<',X_Str_Mat{i,1},'>');
+        end
 
         for k = 1:size(X_Str_Mat,1)
             X_Find = X_Str_Mat{k,1};

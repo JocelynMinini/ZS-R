@@ -7,10 +7,16 @@ function [Y,ExeSucess] = ZS_evalModel(modelToEvaluate,Input,dispOpts)
 %                 type models. 
 % Last Update:    17.11.2023
 %-------------------------------------------------------------------------------
+arguments
+    modelToEvaluate (1,1) uq_model
+    Input           
+    dispOpts        (1,1) logical = false
+end
 
 t_Start = tic; % start a timer
 
 try
+
 % The function uq_generateINP will generate the N .inp files, see
 % uq_generateINP documentation.
 %-------------------------------------------------------------------------------
@@ -20,17 +26,16 @@ Extension = Extension{end};
 
 
 status = ZS_generateINP(modelToEvaluate,Input); % generate the inp files
+    
 
-if ~exist("dispOpts","var")
-    dispOpts = false;
-end
 
 if status == 0
     disp('### Calculation aborted by the user ###')
     fprintf('\n');
     Y = 'Aborted';
     return
-else
+end
+
 
 pause(2)
 %-------------------------------------------------------------------------------
@@ -99,7 +104,6 @@ try
     end
 end
 
-end
 %-------------------------------------------------------------------------------
 
 %save(fullfile(ExePath,[modelToEvaluate.Name,'.mat']),'X','Y'); % Save the files
